@@ -77,6 +77,9 @@ const Rating = (props) => {
           setShownValue(index + getInc(e));
         }}
         onClick={(e) => {
+          if (savedValue === index + 1) {
+            return showAndSave(0);
+          }
           showAndSave(index + getInc(e));
         }}
       />
