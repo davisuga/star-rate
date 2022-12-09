@@ -1,40 +1,64 @@
 //@ts-check
 import React, { useEffect, useRef, useState } from "react";
 import "./Rating.css";
-const def = {
-  // 0.5 to 5
-  value: 0,
-  emptyIcon: undefined,
-  halfFilledIcon: undefined,
-  filledIcon: undefined,
-  steps: 0.5,
-};
 
 // const calcIncrement = ()
 
-const Rating = (props = def) => {
+const Rating = (props) => {
   const emptyIcon = props.emptyIcon || "/icons/stars/empty.svg";
   const filledIcon = props.filledIcon || "/icons/stars/filled.svg";
   const halfFilledIcon = props.halfFilledIcon || "/icons/stars/half.svg";
   const [savedValue, setSavedValue] = useState(props.value);
   const [shownValue, setShownValue] = useState(savedValue);
 
-  const showHalfSteps = props.steps % 1 === 0.5;
+  const value = props.value || shownValue || 0;
+
+  const showHalfSteps = props.steps === 0.5;
+  console.log("value", value);
 
   const isLessThanHalf = (event) => {
     const { target } = event;
     const boundingClientRect = target.getBoundingClientRect();
     let mouseAt = event.clientX - boundingClientRect.left;
     mouseAt = Math.round(Math.abs(mouseAt));
-    const half = mouseAt <= boundingClientRect.width / 2;
-    console.log({ half });
-    return half;
+    return mouseAt <= boundingClientRect.width / 2;
   };
+
+  const showAndSave = (newVal) => {
+    setShownValue(newVal);
+    setSavedValue(newVal);
+  };
+
+  useEffect(() => {
+    const handler = (e) => {
+      console.log(e.key);
+      switch (e.key) {
+        case "ArrowLeft":
+          showAndSave(value - (props.steps || 1));
+
+          break;
+        case "ArrowRight":
+          showAndSave(value + (props.steps || 1));
+
+          break;
+
+        default:
+          setShownValue(Number(e.key));
+          setSavedValue(Number(e.key));
+          break;
+      }
+    };
+    window.addEventListener("keyup", handler);
+
+    return () => {
+      window.removeEventListener("keyup", handler);
+    };
+  }, [shownValue, value, savedValue]);
 
   // Utility function to calculate if the mouse event happened on the left side of the target or the right side.
 
   const renderSymbol = (symbolVal, index) => {
-    const getInc = (e) => (showHalfSteps && isLessThanHalf(e) ? 1.5 : 1);
+    const getInc = (e) => (showHalfSteps && isLessThanHalf(e) ? 0.5 : 1);
 
     return (
       <img
@@ -66,10 +90,10 @@ const Rating = (props = def) => {
       data-testid="star-rating-container"
     >
       {[0, 0, 0, 0, 0].map((_, index) => {
-        const correctedIndex = index + 2;
-        const adjustedValue =
-          correctedIndex <= shownValue ? 1 : correctedIndex - shownValue;
-
+        const correctedIndex = index + 1;
+        if (correctedIndex <= value) return renderSymbol(1, index);
+        const adjustedValue = correctedIndex > value + 1 ? 0 : value % 1;
+        console.log(adjustedValue);
         return renderSymbol(adjustedValue, index);
       })}
     </div>
