@@ -32,7 +32,7 @@ const Rating = (props) => {
 
   useEffect(() => {
     const handler = (e) => {
-      console.log(e.key);
+      console.log("received key", e.key);
       switch (e.key) {
         case "ArrowLeft":
           showAndSave(value - (props.steps || 1));
@@ -49,10 +49,12 @@ const Rating = (props) => {
           break;
       }
     };
-    window.addEventListener("keyup", handler);
+    // window.addEventListener("keyup", handler);
+    window.addEventListener("keydown", handler);
 
     return () => {
-      window.removeEventListener("keyup", handler);
+      window.removeEventListener("keydown", handler);
+      //   window.removeEventListener("keyup", handler);
     };
   }, [shownValue, value, savedValue]);
 
@@ -97,7 +99,7 @@ const Rating = (props) => {
         const correctedIndex = index + 1;
         if (correctedIndex <= value) return renderSymbol(1, index);
         const adjustedValue = correctedIndex > value + 1 ? 0 : value % 1;
-        console.log(adjustedValue);
+
         return renderSymbol(adjustedValue, index);
       })}
     </div>
