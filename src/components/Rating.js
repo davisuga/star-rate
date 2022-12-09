@@ -25,6 +25,7 @@ const Rating = (props) => {
   };
 
   const showAndSave = (newVal) => {
+    if (newVal < 0 || newVal > 5) return;
     setShownValue(newVal);
     setSavedValue(newVal);
   };
@@ -76,7 +77,7 @@ const Rating = (props) => {
           setShownValue(index + getInc(e));
         }}
         onClick={(e) => {
-          setSavedValue(index + getInc(e));
+          showAndSave(index + getInc(e));
         }}
       />
     );
